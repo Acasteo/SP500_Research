@@ -1,0 +1,106 @@
+---
+title: "Research"
+author: "Austin Castelo"
+date: "April 21, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(MASS)
+```
+Initialize Data
+
+```{r}
+Market_Data <- read_excel("C:/Users/caste/Desktop/PSTAT199/Market Data.xlsx")
+MD <- Market_Data
+MD = MD[-1,]
+MD = MD[-1,]
+MD = MD[-1,]
+MD = MD[-1,]
+MD = MD[-1,]
+MD$`Price Earnings Ratio One-Year Earnings`[143:146] = c(17.03, 18.15, 20.02, 22.18)
+MD$`Price Earnings Ratio Ten-Year Earnings`[144:146] = c(24.86, 26.49, 24.21)
+GDP <- data.matrix(MD[2:2])
+S_P <- read_excel("C:/Users/caste/Desktop/PSTAT199/Market Data.xlsx", 
+                       sheet = "S&P Daily")
+SPY <- data.matrix(S_P[8])
+```
+
+Adjusting for Inflation and finding D(t)
+```{r}
+Adj_inf <- MD$CPI[80:147]/MD$CPI[80]## Adjusted inflation relataive 1950
+SPY = SPY[1:68,]/Adj_inf
+D_t <- matrix(nrow = 66, ncol = 1)
+for(i in 2:66){D_t[i-1] = (SPY[i]/SPY[i-1])-1}
+D_t = D_t[-66,]
+```
+
+```{r}
+PE1_lm = lm(D_t~MD$`Price Earnings Ratio One-Year Earnings`[80:144])
+CPI_lm = lm(D_t~MD$CPI[80:144])
+GDP_lm = lm(D_t[11:65]~MD$`GDP (current US$)`[90:144])
+PE10_lm = lm(D_t~MD$`Price Earnings Ratio Ten-Year Earnings`[80:144])
+LongBond_lm = lm(D_t~MD$`Long Government Bond Yield 10yrpost53`[80:144])
+RD_lm = lm(D_t[1:63]~MD$`RealD S&P Dividend`[80:142])
+Consump_lm = lm(D_t[1:60]~MD$`Real Per Capita Consumption (in 2005 dollars)`[80:139])
+GDPDEfl_lm = lm(D_t[12:65]~MD$`Inflation, GDP deflator (annual %)`[91:144])
+Earning_lm = lm(D_t[1:62]~MD$`RealE Earnings`[80:141])
+IntRate_lm = lm(D_t[1:62]~MD$`One-Year Interest Rate`[80:141])
+SPComp_lm = lm(D_t~MD$`S&P Composite Stock Price Index`[80:144])
+DivIn_lm = lm(D_t[1:64]~MD$`Dividends Accuring to Index`[80:143])
+Full = lm(D_t[12:60]~ MD$`Price Earnings Ratio One-Year Earnings`[91:139] + MD$`Price Earnings Ratio Ten-Year Earnings`[91:139] + MD$CPI[91:139] + MD$`S&P Composite Stock Price Index`[91:139] + MD$`GDP (current US$)`[91:139] + MD$`Long Government Bond Yield 10yrpost53`[91:139] +MD$`RealD S&P Dividend`[91:139] + MD$`Real Per Capita Consumption (in 2005 dollars)`[91:139] +MD$`Inflation, GDP deflator (annual %)`[91:139] +MD$`RealE Earnings`[91:139]+ MD$`One-Year Interest Rate`[91:139]+ MD$`S&P Composite Stock Price Index`[91:139] + MD$`Dividends Accuring to Index`[91:139])
+
+```
+#GDP
+```{r}
+summary(GDP_lm)
+```
+#Price Earning ratio 1 year
+```{r}
+summary(PE10_lm)
+```
+#Dividends
+```{r}
+summary(RD_lm)
+```
+#Bond Yield 10yr
+```{r}
+summary(LongBond_lm)
+```
+#Consumption Per Capita
+```{r}
+summary(Consump_lm)
+```
+#GDP Deflator
+```{r}
+summary(GDPDEfl_lm)
+```
+#Earnings
+```{r}
+summary(Earning_lm)
+```
+#Intrest Rate
+```{r}
+summary(IntRate_lm)
+```
+#S&P Price Index
+```{r}
+summary(SPComp_lm)
+```
+# Dividend Acruing to Index
+```{r}
+summary(DivIn_lm)
+```
+#Full Model with all parameters
+```{r}
+summary(Full)
+```
+#Plots of PE ratios over years
+```{r}
+
+plot(MD$Year, MD$`Price Earnings Ratio Ten-Year Earnings`)
+plot(MD$Year, MD$`Price Earnings Ratio One-Year Earnings`)
+```
+

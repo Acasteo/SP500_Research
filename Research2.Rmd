@@ -1,0 +1,179 @@
+---
+title: "Research2"
+author: "Austin Castelo and Isaac Golberg"
+date: "April 27, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(MASS)
+```
+Adjust Inflation to Monthly (Task 3)
+```{r}
+EconData <- read.csv("C:/Users/caste/Desktop/PSTAT199/EconData.csv")
+EconData$Inflation  <- EconData$Inflation/12
+EconData$Inflation[1] <- 0.024/12
+EconData$AdjustedSP <- EconData$S.P.500.Real.Price.by.Month/(1+ EconData$Inflation)
+EconData$AdjustedPE <- EconData$S.P.500.PE.Ratio.by.Month./(1+ EconData$Inflation)
+EconData$AdjustedPE2 <- EconData$Shiller.PE.Ratio.by.Month/(1+ EconData$Inflation)
+attach(EconData)
+```
+
+##Linear regression for inflation-adjusted PE
+```{r}
+D_t <- matrix(nrow = 1767, ncol = 1)
+for(i in 2:1767){D_t[i-1] = log(AdjustedSP[i]/AdjustedSP[i-1])}
+D_t = D_t[-1767,]
+```
+
+```{r}
+PElm = lm(D_t ~ AdjustedPE[1:1766])
+summary(PElm)
+plot( AdjustedPE[1:1766], D_t)
+```
+
+##Linear regression for inflation-adjusted PE 10-year
+```{r}
+D_t2 <- matrix(nrow = 1647, ncol = 1)
+for(i in 2:1647){D_t2[i-1] = log(AdjustedSP[i]/AdjustedSP[i-1])}
+D_t2 = D_t2[-1647,]
+```
+
+```{r}
+PElm2 = lm(D_t2 ~ AdjustedPE2[1:1646])
+summary(PElm2)
+plot( AdjustedPE2[1:1646], D_t2)
+```
+
+##Calculate for different values of k for PE
+k = 12
+```{r}
+D_t <- matrix(nrow = 1755, ncol = 1)
+for(i in 1:1755){D_t[i] = log(AdjustedSP[i+12]/AdjustedSP[i])}
+```
+
+```{r}
+PElm = lm(D_t ~ AdjustedPE[1:1755])
+summary(PElm)
+```
+k = 36
+```{r}
+D_t <- matrix(nrow = (1767-36), ncol = 1)
+for(i in 1:(1767-36)){D_t[i] = log(AdjustedSP[i+36]/AdjustedSP[i])}
+```
+
+```{r}
+PElm = lm(D_t ~ AdjustedPE[1:(1767-36)])
+summary(PElm)
+```
+k = 120
+```{r}
+D_t <- matrix(nrow = (1767-120), ncol = 1)
+for(i in 1:(1767-120)){D_t[i] = log(AdjustedSP[i+120]/AdjustedSP[i])}
+```
+
+```{r}
+PElm = lm(D_t ~ AdjustedPE[1:(1767-120)])
+summary(PElm)
+```
+
+k = 240
+```{r}
+D_t <- matrix(nrow = (1767-240), ncol = 1)
+for(i in 1:(1767-240)){D_t[i] = log(AdjustedSP[i+240]/AdjustedSP[i])}
+```
+
+```{r}
+PElm = lm(D_t ~ AdjustedPE[1:(1767-240)])
+summary(PElm)
+```
+
+k = 6
+```{r}
+D_t <- matrix(nrow = (1767-6), ncol = 1)
+for(i in 1:(1767-6)){D_t[i] = log(AdjustedSP[i+6]/AdjustedSP[i])}
+```
+
+```{r}
+PElm = lm(D_t ~ AdjustedPE[1:(1767-6)])
+summary(PElm)
+```
+
+##Calculate for different values of k for PE 10 year
+k = 12
+```{r}
+D_t2 <- matrix(nrow = (1646-12), ncol = 1)
+for(i in 1:(1646-12)){D_t2[i] = log(AdjustedSP[i+12]/AdjustedSP[i])}
+```
+
+```{r}
+PElm2 = lm(D_t2 ~ AdjustedPE[1:(1646-12)])
+summary(PElm2)
+```
+k = 36
+```{r}
+D_t2 <- matrix(nrow = (1646-36), ncol = 1)
+for(i in 1:(1646-36)){D_t2[i] = log(AdjustedSP[i+36]/AdjustedSP[i])}
+```
+
+```{r}
+PElm2 = lm(D_t2 ~ AdjustedPE[1:(1646-36)])
+summary(PElm2)
+```
+k = 120
+```{r}
+D_t2 <- matrix(nrow = (1646-120), ncol = 1)
+for(i in 1:(1646-120)){D_t2[i] = log(AdjustedSP[i+120]/AdjustedSP[i])}
+```
+
+```{r}
+PElm2 = lm(D_t2 ~ AdjustedPE[1:(1646-120)])
+summary(PElm2)
+```
+
+k = 240
+```{r}
+D_t2 <- matrix(nrow = (1646-240), ncol = 1)
+for(i in 1:(1646-240)){D_t2[i] = log(AdjustedSP[i+240]/AdjustedSP[i])}
+```
+
+```{r}
+PElm2 = lm(D_t2 ~ AdjustedPE[1:(1646-240)])
+summary(PElm2)
+```
+
+k = 6
+```{r}
+D_t2 <- matrix(nrow = (1646-6), ncol = 1)
+for(i in 1:(1646-6)){D_t2[i] = log(AdjustedSP[i+6]/AdjustedSP[i])}
+```
+
+```{r}
+PElm2 = lm(D_t2 ~ AdjustedPE[1:(1646-6)])
+summary(PElm2)
+```
+```{r}
+res <- matrix(nrow = 271, ncol = 6)
+pos <- 1
+for (i in 30:301){
+  D_ti <- matrix(nrow = (1755-i), ncol =1)
+  D_ti <- log(AdjustedSP[(i+1):1755]/AdjustedSP[1:(1755-i)])
+  lmod <- summary(lm(D_ti ~ AdjustedPE[1:(1755-i)]))
+  res[(i-30),1] <-  lmod$coefficients[1,1]
+  res[(i-30),2] <-  lmod$coefficients[1,2]
+  res[(i-30),3] <-  lmod$coefficients[2,1]
+  res[(i-30),4] <-  lmod$coefficients[2,2]
+  res[(i-30),5] <-  lmod$coefficients[1,4]
+  res[(i-30),6] <-  lmod$coefficients[2,4]
+}
+res <- as.data.frame(res)
+colnames(res) <- c("Intercept", "PE Estimate Coefficient", "Intercept Std. Error", "PE Estimate Std. Error", "Intercept p-value","PE p-value")
+row.names(res) <- c(30:(nrow(res)+29))
+```
+
+```{r}
+library(xlsx)
+write.csv(res, file = "C:/Users/caste/Desktop/PSTAT199/Research_Wk2.csv")
+```

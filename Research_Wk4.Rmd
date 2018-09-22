@@ -1,0 +1,93 @@
+---
+title: "Linear Regression of delta t and 2D AR(1) model"
+author: "Austin Castelo and Isaac Golberg"
+date: "May 2, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(MASS)
+library(nlme)
+library(mAr)
+```
+```{r}
+T_Bills_3_month_1934_2018 <- read_excel("C:/Users/caste/Desktop/PSTAT199/T-Bills.xlsx")
+EconData <- read.csv("C:/Users/caste/Desktop/PSTAT199/EconData.csv")
+EconData$Inflation[1] <- 0.024
+EconData$Inflation = EconData$Inflation/12
+for (i in 1:1011){
+  EconData$AdjInf[i] <- (1+sum(EconData$Inflation[i:1011]))/(1+EconData$Inflation[1011])}
+
+
+```
+
+
+```{r}
+EconData$AdjustedPE <- EconData$S.P.500.PE.Ratio.by.Month./(1+ EconData$Inflation)
+Pt <- EconData$AdjustedPE[1:1011]
+P_ <- mean(Pt)
+
+tb <- T_Bills_3_month_1934_2018$TB3
+Rt <- (tb/12 - EconData$Inflation[1:1011])
+R_ <- mean(Rt)
+```
+
+ 
+```{r}
+pHat <- Pt - P_
+rHat <- Rt - R_
+
+```
+
+
+```{r}
+EconData$AdjustedSP <- EconData$S.P.500.Real.Price.by.Month/EconData$AdjInf
+SP <- EconData$AdjustedSP[1:1014]
+g <- (1/1010)*log(SP[1]/SP[1011])
+gmat <- matrix(nrow = 1011, ncol = 1)
+for (i in 1:1011){
+  gmat[i] <- g
+}
+```
+
+```{r}
+delT <- matrix(nrow = 1012, ncol = 1)
+for(i in 1:1012){delT[i] = log(SP[i]/SP[i+1])}
+delT = delT[-1012,]
+```
+
+
+
+```{r}
+mod <- lm(delT ~ gmat + (pHat) + (rHat))
+summary(mod)
+
+```
+
+```{r}
+yhat <- fitted(mod)
+e <- delT - yhat
+plot(yhat, e[1:1011], main = "Residuals vs Fit v1")
+```
+
+```{r}
+qqnorm(e)
+qqline(e)
+```
+
+```{r}
+qqnorm(e)
+qqline(e)
+```
+
+
+```{r}
+mod2 <- matrix(c(rHat, pHat), nrow = 1011, ncol = 2)
+mod3 <- mAr.est(mod2, 1)
+AHat <- mod3$AHat
+CHat <- mod3$CHat
+mAr.eig(AHat, CHat)
+AHat
+```
